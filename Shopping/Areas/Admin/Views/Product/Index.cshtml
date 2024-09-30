@@ -1,0 +1,38 @@
+﻿@model IEnumerable<ProductModel>
+@{
+    ViewData["Title"] = "Product List";
+}
+<h3>List san pham</h3>
+<a class="btn btn-success btn-sm" asp-area- asp-action="Create" asp-controller="Product">Thêm</a>
+<table class="table">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Ma SP</th>
+            <th>Ten SP</th>
+            <th>Mo ta</th>
+            <th>Hinh anh</th>
+            <th>Don gia</th>
+            <th>Category</th>
+            <th>Brand</th>
+            <th>Hành động</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td scope="row">1</td>
+                <td>@item.id</td>
+                <td>@item.name</td>
+                <td>@item.description</td>
+                <td><img src="~/media/products/@item.image" width="120"/></td>
+                <td>@item.price</td>
+                <td>@item.category.name</td>
+                <td>@item.brand.name</td>
+                <td><a class="btn btn-warning btn-sm" asp-action="Edit" asp-controller="Product" asp-route-id="@item.id">Sửa</a></td>
+                <td><a class="btn btn-danger btn-sm" asp-action="Delete" asp-controller="Product" asp-route-id="@item.id">Xóa</a></td>
+            </tr>
+        }
+    </tbody>
+</table>
