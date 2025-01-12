@@ -1,10 +1,10 @@
-﻿@model ProductModel
+﻿@model BrandModel
 @{
-    ViewData["Title"] = "Thêm sản phẩm";
+    ViewData["Title"] = "Cập nhật danh mục";
 }
 <h3>Thêm sản phẩm</h3>
 <div class="col-md-9">
-    <form asp-action="Create" enctype="multipart/form-data">
+    <form asp-action="Edit" enctype="multipart/form-data">
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
         <div class="form-group">
             <label>Name</label>
@@ -12,37 +12,20 @@
             <span asp-validation-for="name" class="text-danger"></span>
         </div>
         <div class="form-group">
-            <label>Price</label>
-            <input asp-for="price" class="form-control" />
-            <span asp-validation-for="price" class="text-danger"></span>
-        </div>
-        <div class="form-group">
             <label>Description</label>
             <textarea asp-for="description" id="description" class="form-control"></textarea>
             <span asp-validation-for="description" class="text-danger"></span>
         </div>
         <div class="form-group">
-            <label>Category</label>
-            <select asp-for="categoryId" class="form-control" asp-items="ViewBag.Category">
-                <option>--- Chọn category ---</option>
+            <label>Status</label>
+            <select asp-for="status" class="form-control">
+                <option value="1">Hiển thị</option>
+                <option value="0">Ẩn</option>
             </select>
-            <span asp-validation-for="categoryId" class="text-danger"></span>
+            <span asp-validation-for="status" class="text-danger"></span>
         </div>
         <div class="form-group">
-            <label>Brand</label>
-            <select asp-for="brandId" class="form-control" asp-items="ViewBag.Brand">
-                <option>--- Chọn brand ---</option>
-            </select>
-            <span asp-validation-for="brandId" class="text-danger"></span>
-        </div>
-        <div class="form-group">
-            <label>Image</label>
-            <input asp-for="ImageUpload" class="form-control" />
-            <span asp-validation-for="ImageUpload" class="text-danger"></span>
-            <img id="imgpreview" class="pt-2"/>
-        </div>
-        <div class="form-group">
-            <button class="btn btn-success">Thêm</button>
+            <button class="btn btn-success">Cập nhật</button>
         </div>
     </form>
     <a asp-action="Index">Trở về</a>
@@ -51,11 +34,6 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-    <script>
-        $("#imgpreview").change(function () {
-            readURL(this);
-        })
-    </script>
     <script type="importmap">
         {
             "imports": {
