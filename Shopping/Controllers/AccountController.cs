@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Shopping.Models;
 using Shopping.Models.ViewModels;
@@ -73,6 +74,13 @@ namespace Shopping.Controllers
 				}
 			}
 			return View(user);
+		}
+
+		public async Task<IActionResult> Logout(string returnUrl = "/")
+		{
+			await _signInManager.SignOutAsync();
+			await HttpContext.SignOutAsync();
+			return Redirect(returnUrl);
 		}
 	}
 }

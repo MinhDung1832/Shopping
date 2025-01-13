@@ -18,11 +18,11 @@ namespace Shopping.Models
 
 		public CartItemModel() { }
 		public CartItemModel(ProductModel product) {
-			productId = product.id;
-			productName = product.name;
-			price = product.price;
+			productId = product.Id;
+			productName = product.Name;
+			price = product.Price;
 			quantity = 1;
-			image = product.image;
+			image = product.Image;
 		}
 	}
 }

@@ -1,60 +1,76 @@
 ﻿@model ProductModel
 @{
-    ViewData["Title"] = "Thêm sản phẩm";
+    ViewData["title"] = "Create Product";
 }
-<h3>Thêm sản phẩm</h3>
+
+
+<h3>Create Product</h3>
+
 <div class="col-md-9">
-    <form asp-action="Create" enctype="multipart/form-data">
+    <form autocomplete="off" asp-action="Create" enctype="multipart/form-data">
+
+
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
         <div class="form-group">
             <label>Name</label>
-            <input asp-for="name" class="form-control" />
-            <span asp-validation-for="name" class="text-danger"></span>
+            <input asp-for="Name" class="form-control" />
+            <span asp-validation-for="Name" class="text-danger"></span>
         </div>
+
         <div class="form-group">
             <label>Price</label>
-            <input asp-for="price" class="form-control" />
-            <span asp-validation-for="price" class="text-danger"></span>
+            <input asp-for="Price" pattern="[0-9.,]+" class="form-control typing-price" />
+
+            <span id="price-convert"></span>
+
+            <span asp-validation-for="Price" class="text-danger"></span>
         </div>
+
         <div class="form-group">
             <label>Description</label>
-            <textarea asp-for="description" id="description" class="form-control"></textarea>
-            <span asp-validation-for="description" class="text-danger"></span>
+            <textarea asp-for="Description" class="form-control"> </textarea>
+            <span asp-validation-for="Description" class="text-danger"></span>
         </div>
+
         <div class="form-group">
             <label>Category</label>
-            <select asp-for="categoryId" class="form-control" asp-items="ViewBag.Category">
-                <option>--- Chọn category ---</option>
+            <select asp-for="CategoryId" class="form-control" asp-items="ViewBag.Category">
+                <option>--Choose a category</option>
             </select>
-            <span asp-validation-for="categoryId" class="text-danger"></span>
+            <span asp-validation-for="CategoryId" class="text-danger"></span>
         </div>
+
         <div class="form-group">
             <label>Brand</label>
-            <select asp-for="brandId" class="form-control" asp-items="ViewBag.Brand">
-                <option>--- Chọn brand ---</option>
+            <select asp-for="BrandId" class="form-control" asp-items="ViewBag.Brand">
+                <option>--Choose a brand</option>
             </select>
-            <span asp-validation-for="brandId" class="text-danger"></span>
+            <span asp-validation-for="BrandId" class="text-danger"></span>
         </div>
+
         <div class="form-group">
             <label>Image</label>
             <input asp-for="ImageUpload" class="form-control" />
             <span asp-validation-for="ImageUpload" class="text-danger"></span>
-            <img id="imgpreview" class="pt-2"/>
+            <img id="imgpreview" class="pt-2" />
         </div>
+
         <div class="form-group">
-            <button class="btn btn-success">Thêm</button>
+            <button class="btn btn-primary">Create</button>
         </div>
+
+
     </form>
-    <a asp-action="Index">Trở về</a>
+    <a asp-action="Index">Back to list product</a>
 </div>
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
     <script>
-        $("#imgpreview").change(function () {
+        $("#ImageUpload").change(function () {
             readURL(this);
-        })
+        });
     </script>
     <script type="importmap">
         {
@@ -87,5 +103,19 @@
             .catch(error => {
                 console.error(error);
             });
+    </script>
+    <script>
+        $(".typing-price").on("keyup", function () {
+
+            var currency_input = $(this).val(); //29980000
+
+            $("#price-convert").html(
+
+                new Intl.NumberFormat('vn-VN', { style: 'currency', currency: 'VND' }).format(
+                    currency_input,
+
+                )
+            );
+        });
     </script>
 }

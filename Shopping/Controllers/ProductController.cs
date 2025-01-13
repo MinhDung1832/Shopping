@@ -20,7 +20,7 @@ namespace Shopping.Controllers
 		{
             if (id == null) return RedirectToAction("Index");
 
-            var productById = _dataContext.Products.Where(s => s.id == id).FirstOrDefault();
+            var productById = _dataContext.Products.Where(s => s.Id == id).FirstOrDefault();
 
 			return View(productById);
 		}

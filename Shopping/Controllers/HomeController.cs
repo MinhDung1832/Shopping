@@ -19,7 +19,7 @@ namespace Shopping.Controllers
 
         public IActionResult Index()
         {
-            var products = _dataContext.Products.Include("category").Include("brand").ToList();
+            var products = _dataContext.Products.Include("Category").Include("Brand").ToList();
             return View(products);
         }
 

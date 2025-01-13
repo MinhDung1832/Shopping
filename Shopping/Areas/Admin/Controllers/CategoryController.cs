@@ -18,7 +18,7 @@ namespace Shopping.Areas.Admin.Controllers
         }
         public async Task<IActionResult> Index()
         {
-            return View(await _dataContext.Categories.OrderByDescending(p => p.id).ToListAsync());
+            return View(await _dataContext.Categories.OrderByDescending(p => p.Id).ToListAsync());
         }
         [HttpGet]
         public IActionResult Create()
@@ -35,8 +35,8 @@ namespace Shopping.Areas.Admin.Controllers
         {
             if (ModelState.IsValid)
             {
-                category.slug = category.name.Replace(" ", "-");
-                var slug = await _dataContext.Categories.FirstOrDefaultAsync(s => s.slug == category.slug);
+                category.Slug = category.Name.Replace(" ", "-");
+                var slug = await _dataContext.Categories.FirstOrDefaultAsync(s => s.Slug == category.Slug);
                 if (slug != null)
                 {
                     ModelState.AddModelError("", "Danh mục đã tồn tại");
@@ -67,7 +67,7 @@ namespace Shopping.Areas.Admin.Controllers
 
         public async Task<IActionResult> Edit(int id)
         {
-            CategoryModel category = await _dataContext.Categories.FirstOrDefaultAsync(p => p.id == id);
+            CategoryModel category = await _dataContext.Categories.FirstOrDefaultAsync(p => p.Id == id);
             return View(category);
         }
 
@@ -75,20 +75,20 @@ namespace Shopping.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, CategoryModel category)
         {
-            var existed_category = _dataContext.Categories.Find(category.id);
+            var existed_category = _dataContext.Categories.Find(category.Id);
             if (ModelState.IsValid)
             {
-                category.slug = category.name.Replace(" ", "-");
+                category.Slug = category.Name.Replace(" ", "-");
                 //var slug = await _dataContext.Categories.FirstOrDefaultAsync(s => s.slug == category.slug);
                 //if (slug != null)
                 //{
                 //    ModelState.AddModelError("", "Danh mục đã tồn tại");
                 //    return View(category);
                 //}
-                existed_category.name = category.name;
-                existed_category.slug = category.slug;
-                existed_category.description = category.description;
-                existed_category.status = category.status;
+                existed_category.Name = category.Name;
+                existed_category.Slug = category.Slug;
+                existed_category.Description = category.Description;
+                existed_category.Status = category.Status;
 
                 _dataContext.Update(existed_category);
                 await _dataContext.SaveChangesAsync();
@@ -114,7 +114,7 @@ namespace Shopping.Areas.Admin.Controllers
 
         public async Task<IActionResult> Delete(int id)
         {
-            CategoryModel category = await _dataContext.Categories.FirstOrDefaultAsync(p => p.id == id);
+            CategoryModel category = await _dataContext.Categories.FirstOrDefaultAsync(p => p.Id == id);
 
             _dataContext.Categories.Remove(category);
             await _dataContext.SaveChangesAsync();

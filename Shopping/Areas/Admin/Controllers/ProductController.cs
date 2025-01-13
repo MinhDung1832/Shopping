@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Shopping.Models;
@@ -7,6 +9,9 @@ using Shopping.Repository;
 namespace Shopping.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Route("Admin/Product")]
+    //[Authorize(Roles = "Admin")]
+
     public class ProductController : Controller
     {
         private readonly DataContext _dataContext;
@@ -16,10 +21,14 @@ namespace Shopping.Areas.Admin.Controllers
             _dataContext = context;
             _webHostEnvironment = webHostEnvironment;
         }
+
+        [Route("Index")]
         public async Task<IActionResult> Index()
         {
-            return View(await _dataContext.Products.OrderByDescending(p => p.id).Include(p => p.category).Include(p => p.brand).ToListAsync());
+            return View(await _dataContext.Products.OrderByDescending(p => p.Id).Include(p => p.Category).Include(p => p.Brand).ToListAsync());
         }
+
+        [Route("Create")]
         [HttpGet]
         public IActionResult Create()
         {
@@ -29,47 +38,50 @@ namespace Shopping.Areas.Admin.Controllers
 
             return View();
         }
+
+        [Route("Create")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(ProductModel product)
         {
-            ViewBag.Category = new SelectList(_dataContext.Categories, "id", "name", product.categoryId);
-            ViewBag.Brand = new SelectList(_dataContext.Brands, "id", "name", product.brandId);
+            ViewBag.Categories = new SelectList(_dataContext.Categories, "Id", "Name", product.CategoryId);
+            ViewBag.Brands = new SelectList(_dataContext.Brands, "Id", "Name", product.BrandId);
+
             if (ModelState.IsValid)
             {
-                product.slug = product.name.Replace(" ", "-");
-                var slug = await _dataContext.Products.FirstOrDefaultAsync(s => s.slug == product.slug);
+                product.Slug = product.Name.Replace(" ", "-");
+                var slug = await _dataContext.Products.FirstOrDefaultAsync(p => p.Slug == product.Slug);
                 if (slug != null)
                 {
-                    ModelState.AddModelError("", "Sản phẩm đã tồn tại");
+                    ModelState.AddModelError("", "Sản phẩm đã có trong database");
                     return View(product);
                 }
 
                 if (product.ImageUpload != null)
                 {
-                    string uploadDir = Path.Combine(_webHostEnvironment.WebRootPath, "media/products");
+                    string uploadsDir = Path.Combine(_webHostEnvironment.WebRootPath, "media/products");
                     string imageName = Guid.NewGuid().ToString() + "_" + product.ImageUpload.FileName;
-                    string filePath = Path.Combine(uploadDir, imageName);
+                    string filePath = Path.Combine(uploadsDir, imageName);
 
                     FileStream fs = new FileStream(filePath, FileMode.Create);
                     await product.ImageUpload.CopyToAsync(fs);
                     fs.Close();
-
-                    product.image = imageName;
+                    product.Image = imageName;
                 }
 
                 _dataContext.Add(product);
                 await _dataContext.SaveChangesAsync();
-                TempData["success"] = "Thêm sản phẩm thành công!";
+                TempData["success"] = "Thêm sản phẩm thành công";
                 return RedirectToAction("Index");
+
             }
             else
             {
-                TempData["error"] = "Lỗi";
+                TempData["error"] = "Model có một vài thứ đang lỗi";
                 List<string> errors = new List<string>();
-                foreach (var item in ModelState.Values)
+                foreach (var value in ModelState.Values)
                 {
-                    foreach (var error in item.Errors)
+                    foreach (var error in value.Errors)
                     {
                         errors.Add(error.ErrorMessage);
                     }
@@ -80,102 +92,89 @@ namespace Shopping.Areas.Admin.Controllers
             return View(product);
         }
 
-        public async Task<IActionResult> Edit(int id)
+        [Route("Edit")]
+
+        public async Task<IActionResult> Edit(long Id)
         {
-            ProductModel product = await _dataContext.Products.FirstOrDefaultAsync(p => p.id == id);
-            ViewBag.Category = new SelectList(_dataContext.Categories, "id", "name", product.categoryId);
-            ViewBag.Brand = new SelectList(_dataContext.Brands, "id", "name", product.brandId);
+            ProductModel product = await _dataContext.Products.FindAsync(Id);
+            ViewBag.Categories = new SelectList(_dataContext.Categories, "Id", "Name", product.CategoryId);
+            ViewBag.Brands = new SelectList(_dataContext.Brands, "Id", "Name", product.BrandId);
+
+            return View(product);
+        }
+
+        [Route("Edit")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(ProductModel product)
+        {
+            var existed_product = _dataContext.Products.Find(product.Id); //tìm sp theo id product
+            ViewBag.Categories = new SelectList(_dataContext.Categories, "Id", "Name", product.CategoryId);
+            ViewBag.Brands = new SelectList(_dataContext.Brands, "Id", "Name", product.BrandId);
+
+            if (ModelState.IsValid)
+            {
+                product.Slug = product.Name.Replace(" ", "-");
+
+                if (product.ImageUpload != null)
+                {
+                    string uploadsDir = Path.Combine(_webHostEnvironment.WebRootPath, "media/products");
+                    string imageName = Guid.NewGuid().ToString() + "_" + product.ImageUpload.FileName;
+                    string filePath = Path.Combine(uploadsDir, imageName);
+
+                    FileStream fs = new FileStream(filePath, FileMode.Create);
+                    await product.ImageUpload.CopyToAsync(fs);
+                    fs.Close();
+                    existed_product.Image = imageName;
+                }
+
+
+                // Update other product properties
+                existed_product.Name = product.Name;
+                existed_product.Description = product.Description;
+                existed_product.Price = product.Price;
+                existed_product.CategoryId = product.CategoryId;
+                existed_product.BrandId = product.BrandId;
+                // ... other properties
+                _dataContext.Update(existed_product);
+                await _dataContext.SaveChangesAsync();
+                TempData["success"] = "Cập nhật sản phẩm thành công";
+                return RedirectToAction("Index");
+
+            }
+            else
+            {
+                TempData["error"] = "Model có một vài thứ đang lỗi";
+                List<string> errors = new List<string>();
+                foreach (var value in ModelState.Values)
+                {
+                    foreach (var error in value.Errors)
+                    {
+                        errors.Add(error.ErrorMessage);
+                    }
+                }
+                string errorMessage = string.Join("\n", errors);
+                return BadRequest(errorMessage);
+            }
             return View(product);
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, ProductModel product)
+        public async Task<IActionResult> Delete(int Id)
         {
-            ViewBag.Category = new SelectList(_dataContext.Categories, "id", "name", product.categoryId);
-            ViewBag.Brand = new SelectList(_dataContext.Brands, "id", "name", product.brandId);
-
-            var existed_product = _dataContext.Products.Find(product.id);
-            if (ModelState.IsValid)
+            ProductModel product = await _dataContext.Products.FindAsync(Id);
+            if (!string.Equals(product.Image, "noname.jpg"))
             {
-                product.slug = product.name.Replace(" ", "-");
-                var slug = await _dataContext.Products.FirstOrDefaultAsync(s => s.slug == product.slug);
-                if (slug != null)
+                string uploadsDir = Path.Combine(_webHostEnvironment.WebRootPath, "media/products");
+                string oldfilePath = Path.Combine(uploadsDir, product.Image);
+                if (System.IO.File.Exists(oldfilePath))
                 {
-                    ModelState.AddModelError("", "Sản phẩm đã tồn tại");
-                    return View(product);
-                }
-
-                if (product.ImageUpload != null)
-                {
-                    string uploadDir = Path.Combine(_webHostEnvironment.WebRootPath, "media/products");
-                    string imageName = Guid.NewGuid().ToString() + "_" + product.ImageUpload.FileName;
-                    string filePath = Path.Combine(uploadDir, imageName);
-                    try
-                    {
-                        string oldfilePath = Path.Combine(uploadDir, existed_product.image);
-                        if (System.IO.File.Exists(oldfilePath))
-                        {
-                            System.IO.File.Delete(oldfilePath);
-                        }
-
-                    }
-                    catch (Exception ex)
-                    {
-                        ModelState.AddModelError("", "Lỗi xảy ra khi xóa ảnh");
-                    }
-                    FileStream fs = new FileStream(filePath, FileMode.Create);
-                    await product.ImageUpload.CopyToAsync(fs);
-                    fs.Close();
-
-                    existed_product.image = imageName;
-
-                }
-                existed_product.name = product.name;
-                //existed_product.slug = product.slug;
-                existed_product.description = product.description;
-                existed_product.price = product.price;
-                existed_product.categoryId = product.categoryId;
-                existed_product.brandId = product.brandId;
-
-                _dataContext.Update(existed_product);
-                await _dataContext.SaveChangesAsync();
-                TempData["success"] = "Cập nhật sản phẩm thành công!";
-                return RedirectToAction("Index");
-            }
-            else
-            {
-                TempData["error"] = "Lỗi";
-                List<string> errors = new List<string>();
-                foreach (var item in ModelState.Values)
-                {
-                    foreach (var error in item.Errors)
-                    {
-                        errors.Add(error.ErrorMessage);
-                    }
-                }
-                string errorMessage = string.Join("\n", errors);
-                return BadRequest(errorMessage);
-            }
-            return View(product);
-        }
-
-        public async Task<IActionResult> Delete(int id)
-        {
-            ProductModel product = await _dataContext.Products.FirstOrDefaultAsync(p => p.id == id);
-
-            if (!string.Equals(product.image, "noname.jpg"))
-            {
-                string uploadDir = Path.Combine(_webHostEnvironment.WebRootPath, "media/products");
-                string filePath = Path.Combine(uploadDir, product.image);
-                if (System.IO.File.Exists(filePath))
-                {
-                    System.IO.File.Delete(filePath);
+                    System.IO.File.Delete(oldfilePath);
                 }
             }
             _dataContext.Products.Remove(product);
             await _dataContext.SaveChangesAsync();
-            TempData["success"] = "Xóa sản phẩm thành công";
+            TempData["success"] = "sản phẩm đã được xóa thành công";
             return RedirectToAction("Index");
         }
     }

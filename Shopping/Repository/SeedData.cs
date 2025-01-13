@@ -12,28 +12,28 @@ namespace Shopping.Repository
 			{
 				CategoryModel apple = new CategoryModel
 				{
-					name = "Apple",
-					slug = "apple",
-					description = "Apple",
-					status = 1
+					Name = "Apple",
+					Slug = "apple",
+					Description = "Apple",
+					Status = 1
 				};
 				BrandModel dell = new BrandModel
 				{
-					name = "Dell",
-					slug = "dell",
-					description = "dell",
-					status = 1
+					Name = "Dell",
+					Slug = "dell",
+					Description = "dell",
+					Status = 1
 				};
 				_context.Products.AddRange(
 					new ProductModel
 					{
-						name = "Microsoft",
-						slug = "Microsoft",
-						description = "mac",
-						image = "1.jpg",
-						price = 1000,
-						category = apple,
-						brand = dell
+						Name = "Microsoft",
+						Slug = "Microsoft",
+						Description = "mac",
+						Image = "1.jpg",
+						Price = 1000,
+						Category = apple,
+						Brand = dell
 
 					});
 				_context.SaveChanges();

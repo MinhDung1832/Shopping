@@ -4,13 +4,12 @@ namespace Shopping.Models
 {
     public class BrandModel
     {
-		[Key]
-		public int id { get; set; }
-		[Required, MinLength(4, ErrorMessage = "Yêu cầu nhập tên thương hiệu")]
-		public string name { get; set; }
-		[Required, MinLength(4, ErrorMessage = "Yêu cầu nhập mô tả thương hiệu")]
-		public string description { get; set; }
-		public string slug { get; set; }
-		public int status { get; set; }
-	}
+        public int Id { get; set; }
+        [Required(ErrorMessage = "Yêu cầu không được bỏ trống tên thương hiệu")]
+        public string Name { get; set; }
+        [Required(ErrorMessage = "Yêu cầu không được bỏ trống mô tả")]
+        public string Description { get; set; }
+        public string Slug { get; set; }
+        public int? Status { get; set; }
+    }
 }

@@ -15,10 +15,10 @@ namespace Shopping.Controllers
 		}
 		public async Task<IActionResult> Index(string slug = "")
         {
-			CategoryModel category = _dataContext.Categories.Where(s => s.slug == slug).FirstOrDefault();
+			CategoryModel category = _dataContext.Categories.Where(s => s.Slug == slug).FirstOrDefault();
 			if (category == null) return RedirectToAction("Index");
-			var productByCat = _dataContext.Products.Where(s => s.categoryId == category.id);
-            return View(await productByCat.OrderByDescending(s => s.id).ToListAsync());
+			var productByCat = _dataContext.Products.Where(s => s.CategoryId == category.Id);
+            return View(await productByCat.OrderByDescending(s => s.Id).ToListAsync());
         }
     }
 }
