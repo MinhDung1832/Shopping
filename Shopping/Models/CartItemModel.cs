@@ -2,27 +2,32 @@
 
 namespace Shopping.Models
 {
-    public class CartItemModel
+	public class CartItemModel
 	{
-		[Key]
-		public long productId { get; set; }
-		[Required, MinLength(4, ErrorMessage = "Yêu cầu nhập tên thương hiệu")]
-		public string productName { get; set; }
-		[Required, MinLength(4, ErrorMessage = "Yêu cầu nhập mô tả thương hiệu")]
-		public int quantity { get; set; }
-		public decimal price { get; set; }
-		public decimal amount {
-			get { return quantity * price; }
-		}
-		public string image { get; set; }
+		public long ProductId { get; set; }
+		public string? ProductName { get; set; }
+		public int Quantity { get; set; }
+		public decimal Price { get; set; }
 
-		public CartItemModel() { }
-		public CartItemModel(ProductModel product) {
-			productId = product.Id;
-			productName = product.Name;
-			price = product.Price;
-			quantity = 1;
-			image = product.Image;
+		public decimal Total
+		{
+			get { return Quantity * Price; }
+
 		}
+		public string? Image { get; set; }
+
+		public CartItemModel()
+		{
+
+		}
+		public CartItemModel(ProductModel product)
+		{
+			ProductId = product.Id;
+			ProductName = product.Name;
+			Price = product.Price;
+			Quantity = 1;
+			Image = product.Image;
+		}
+
 	}
 }

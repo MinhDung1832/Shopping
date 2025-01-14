@@ -32,8 +32,8 @@ namespace Shopping.Areas.Admin.Controllers
         [HttpGet]
         public IActionResult Create()
         {
-            ViewBag.Category = new SelectList(_dataContext.Categories, "id", "name");
-            ViewBag.Brand = new SelectList(_dataContext.Brands, "id", "name");
+            ViewBag.Category = new SelectList(_dataContext.Categories, "Id", "Name");
+            ViewBag.Brand = new SelectList(_dataContext.Brands, "Id", "Name");
 
 
             return View();
@@ -59,7 +59,7 @@ namespace Shopping.Areas.Admin.Controllers
 
                 if (product.ImageUpload != null)
                 {
-                    string uploadsDir = Path.Combine(_webHostEnvironment.WebRootPath, "media/products");
+                    string uploadsDir = Path.Combine(_webHostEnvironment.WebRootPath, "images");
                     string imageName = Guid.NewGuid().ToString() + "_" + product.ImageUpload.FileName;
                     string filePath = Path.Combine(uploadsDir, imageName);
 
@@ -118,7 +118,7 @@ namespace Shopping.Areas.Admin.Controllers
 
                 if (product.ImageUpload != null)
                 {
-                    string uploadsDir = Path.Combine(_webHostEnvironment.WebRootPath, "media/products");
+                    string uploadsDir = Path.Combine(_webHostEnvironment.WebRootPath, "images");
                     string imageName = Guid.NewGuid().ToString() + "_" + product.ImageUpload.FileName;
                     string filePath = Path.Combine(uploadsDir, imageName);
 
@@ -159,13 +159,14 @@ namespace Shopping.Areas.Admin.Controllers
             return View(product);
         }
 
+        [Route("Delete")]
         [HttpPost]
-        public async Task<IActionResult> Delete(int Id)
+        public async Task<IActionResult> Delete(int id)
         {
-            ProductModel product = await _dataContext.Products.FindAsync(Id);
+            ProductModel product = await _dataContext.Products.FirstOrDefaultAsync(p => p.Id == id);
             if (!string.Equals(product.Image, "noname.jpg"))
             {
-                string uploadsDir = Path.Combine(_webHostEnvironment.WebRootPath, "media/products");
+                string uploadsDir = Path.Combine(_webHostEnvironment.WebRootPath, "images");
                 string oldfilePath = Path.Combine(uploadsDir, product.Image);
                 if (System.IO.File.Exists(oldfilePath))
                 {
@@ -176,6 +177,41 @@ namespace Shopping.Areas.Admin.Controllers
             await _dataContext.SaveChangesAsync();
             TempData["success"] = "sản phẩm đã được xóa thành công";
             return RedirectToAction("Index");
+        }
+
+        [Route("CreateProductQuantity")]
+        [HttpGet]
+        public async Task<IActionResult> CreateProductQuantity(long Id)
+        {
+            var productbyquantity = await _dataContext.ProductQuantities.Where(pq => pq.ProductId == Id).ToListAsync();
+            ViewBag.ProductByQuantity = productbyquantity;
+            ViewBag.ProductId = Id;
+            return View();
+        }
+
+        [Route("UpdateMoreQuantity")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult UpdateMoreQuantity(ProductQuantityModel productQuantityModel)
+        {
+            // Get the product to update
+            var product = _dataContext.Products.Find(productQuantityModel.ProductId);
+
+            if (product == null)
+            {
+                return NotFound(); // Handle product not found scenario
+            }
+            product.Quantity += productQuantityModel.Quantity;
+
+            productQuantityModel.Quantity = productQuantityModel.Quantity;
+            productQuantityModel.ProductId = productQuantityModel.ProductId;
+            productQuantityModel.DateTime = DateTime.Now;
+
+
+            _dataContext.Add(productQuantityModel);
+            _dataContext.SaveChangesAsync();
+            TempData["success"] = "Thêm số lượng sản phẩm thành công";
+            return RedirectToAction("CreateProductQuantity", "Product", new { Id = productQuantityModel.ProductId });
         }
     }
 }
