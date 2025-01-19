@@ -17,5 +17,6 @@ namespace Shopping.Repository
         public DbSet<ProductQuantityModel> ProductQuantities { get; set; }
         public DbSet<CouponModel> Coupons { get; set; }
 		public DbSet<ShippingModel> Shippings { get; set; }
+		public DbSet<RatingModel> Ratings { get; set; }
 	}
 }

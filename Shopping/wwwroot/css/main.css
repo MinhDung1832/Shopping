@@ -761,9 +761,11 @@ h2.title:before{
 }
 
 .brands-name {
-  border: 1px solid #F7F7F0;
-  padding-bottom: 20px;
-  padding-top: 15px;
+	border: 1px solid #F7F7F0;
+	/* padding-bottom: 2px; */
+	/* padding-top: 15px; */
+	padding: 2px 0;
+	margin: 2px;
 }
 
 
@@ -853,6 +855,7 @@ h2.title {
 
 .single-products {
   position: relative;
+  height:400px;
 }
 
 .new, .sale {
@@ -899,7 +902,7 @@ h2.title {
   transition: height 500ms ease 0s;
   width: 100%;
   display: block;
-  opacity:;
+  opacity: 0;
 }
 
 .single-products:hover .product-overlay {
@@ -2085,6 +2088,10 @@ h2.title {
   border-radius: 0;
   color: #FFFFFF;
   margin-top: 17px;
+}
+.btn-danger {
+	border-radius: 0 !important;
+	margin-top: 17px;
 }
 
 

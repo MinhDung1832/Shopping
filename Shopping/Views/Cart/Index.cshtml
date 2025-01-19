@@ -70,7 +70,6 @@
 
 								Ship cost: <p class="cart_total_price">
 									@Model.ShippingPrice.ToString("#,##0 đ")
-
 								</p>
 								@if (@Model.ShippingPrice > 0)
 								{
@@ -203,7 +202,8 @@
 						success: function (result) {
 							// Handle successful update
 							if (result) {
-
+									// alert(result);
+									// console.log(result);
 								location.reload();
 
 							}

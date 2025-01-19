@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Shopping_Tutorial.Models
+namespace Shopping.Models
 {
 	public class RatingModel
 	{

@@ -1,5 +1,5 @@
 ﻿using Shopping.Repository.Validation;
-using Shopping_Tutorial.Models;
+using Shopping.Models;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
